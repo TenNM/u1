@@ -1,9 +1,55 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using X.PagedList.Mvc.Core; @*import this so we get our HTML Helper*@
+@using X.PagedList; @*import this so we can cast our list to IPagedList (only necessary because ViewBag is dynamic)*@
+@using X.PagedList.Mvc.Core.Fluent
+@using X.PagedList.Web.Common
+
+@model USoftModel;
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">usoft</h1>
 </div>
+
+<div>
+    Records on page
+    @using(Html.BeginForm(FormMethod.Get)){
+        @Html.DropDownListFor(m => m.SelectedValue, Model.valuesToSelect, null, new { onchange = @"form.submit();" });
+    }
+
+    @Html.PagedListPager(Model.pList, page => Url.Action("USoft", new { page, Model.SelectedValue }),
+        new PagedListRenderOptions
+        {
+            DisplayItemSliceAndTotal = true,
+
+            ContainerDivClasses = new[] { "nav" },
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+        })
+    <table class="table1">
+        <tr>
+            <th>id</th>
+            <th>text</th>
+            <th>boo</th>
+        </tr>
+        @foreach (var d in Model.pList)
+        {
+            <tr>
+                <td>@d.Id</td>
+                <td>@d.Text</td>
+                <td>@d.Boo</td>
+            </tr>
+
+        }
+    </table>
+    @section Scripts{
+        <script>// Workaround to fix style of text for showing items .. through ..
+            // Problem related to Boostrap 4 according to issue in link below
+            // https://github.com/dncuug/X.PagedList/issues/127
+
+            $(document).ready(function () {
+                $('ul.pagination > li.disabled > a').addClass('page-link');
+            });</script>
+    }
+</div>
+
+
 
